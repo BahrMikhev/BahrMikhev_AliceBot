@@ -1,7 +1,7 @@
 # импортируем библиотеки
 from flask import Flask, request
 import logging
-
+import os
 # библиотека, которая нам понадобится для работы с JSON
 import json
 
@@ -132,4 +132,7 @@ def get_suggests(user_id):
 
 
 if __name__ == '__main__':
-    app.run()
+    if "PORT" in os.environ:
+        app.run(host='0.0.0.0', port=os.environ["PORT"])
+    else:
+        app.run(host='127.0.0.1', port=5000)
