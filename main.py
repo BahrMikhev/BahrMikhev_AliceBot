@@ -328,7 +328,7 @@ def ship_placement(user_id, res, req, called):
         res['response']['text'] = 'Введите координаты ваших кораблей'
         return
     user_field = (req['request']['original_utterance'].lower()).split()
-    state = 'menu'
+    state = 'virtual'
     gameplay_virtual(user_id, res, req, True)
     return
 
