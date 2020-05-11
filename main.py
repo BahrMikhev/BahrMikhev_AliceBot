@@ -84,15 +84,19 @@ def main_menu(user_id, res, req):
         res['response']['buttons'] = suggests
     elif req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state == 'new'
+        handle_dialog(req, res)
         return
     elif req['request']['original_utterance'].lower() in ['авторизация', 'логин', 'войти']:
         state == 'auth'
+        handle_dialog(req, res)
         return
     elif req['request']['original_utterance'].lower() == 'рекорды':
         state == 'scores'
+        handle_dialog(req, res)
         return
     elif req['request']['original_utterance'].lower() in ['помощь', 'помоги', 'что делать']:
         state == 'help'
+        handle_dialog(req, res)
         return
     else:
         res['response']['text'] = 'Что вы хотите сделать?'
@@ -122,12 +126,15 @@ def new_game(user_id, res, req):
 
     if req['request']['original_utterance'].lower() == 'игра на бумаге':
         state == 'paper'
+        handle_dialog(req, res)
         return
     elif req['request']['original_utterance'].lower() == 'игра без бумаги':
         state == 'virtual'
+        handle_dialog(req, res)
         return
     elif req['request']['original_utterance'].lower() == 'назад':
         state == 'menu'
+        handle_dialog(req, res)
         return
     else:
         res['response']['text'] = 'Что вы хотите сделать?'
@@ -171,9 +178,11 @@ def auth(user_id, res, req):
             logged = False
             id_ = -1
             state == 'menu'
+            handle_dialog(req, res)
             return
         elif req['request']['original_utterance'].lower() == 'назад':
             state == 'menu'
+            handle_dialog(req, res)
             return
         else:
             res['response']['text'] = 'Что вы хотите сделать?'
@@ -194,6 +203,28 @@ def help(user_id, res, req):
                                  В игре без бумаги вам необходимо вначале расставить корабли на виртуальном поле, называя координату, количество палуб и ориентацию корабля (вверх, вниз, вправо, влево). Однопалубные корабли ориентировать не нужно.
                                  Так же в этом режиме вам не требуется смотреть за попаданиями в ваши корабли.
                                  Приятной игры!'''
+    sessionStorage[user_id] = {
+        'suggests': [
+            "Назад",
+        ]
+    }
+    # Кнопки
+    suggests = [
+        {'title': suggest, 'hide': True}
+        for suggest in sessionStorage[user_id]['suggests']
+    ]
+    res['response']['buttons'] = suggests
+    if req['request']['original_utterance'].lower() == 'назад':
+        state == 'menu'
+        handle_dialog(req, res)
+        return
+    else:
+        res['response']['text'] = 'Что вы хотите сделать?'
+        suggests = [
+            {'title': suggest, 'hide': True}
+            for suggest in sessionStorage[user_id]['suggests']
+        ]
+        res['response']['buttons'] = suggests
 
 def get_suggests(user_id):
     session = sessionStorage[user_id]
