@@ -274,6 +274,7 @@ def gameplay_virtual(user_id, res, req, called):
             end = True
         return ({"field": field, "powerlist": powerlist, "end": end, "change": change, "code": code, "resultus": resultus})
 
+    logging.info(f"CALLED: {called}")
     if called:
         computer_field = genesis('great_random')
         #Загрузка поля...
@@ -285,7 +286,7 @@ def gameplay_virtual(user_id, res, req, called):
         c_field = sowing(computer_field)
         #Готово
         move = 'computer'
-
+    logging.info(f"DATA:{c_power}, {g_power}, {g_field}, {c_field}")
     if move == 'gamer':
         message = list()
         result = make_move(c_field, input_code(c_field)[0], c_power)
