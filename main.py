@@ -95,8 +95,12 @@ def main_menu(user_id, res, req):
     # Заполняем текст ответа
     if req['session']['new']:
         res['response']['text'] = 'Привет! Давай поиграем в морской бой!'
-    # Получим подсказки
-        res['response']['buttons'] = sessionStorage[user_id]
+        # Кнопки
+        suggests = [
+            {'title': suggest, 'hide': True}
+            for suggest in sessionStorage[user_id]['suggests']
+        ]
+        res['response']['buttons'] = suggests
     print(req, res, state)
     if req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state == 'new'
@@ -128,6 +132,17 @@ def highscores(user_id, res, req):
 
 def help(user_id, res, req):
     pass
+
+def get_suggests(user_id):
+    session = sessionStorage[user_id]
+
+    # Выбираем две первые подсказки из массива.
+    suggests = [
+        {'title': suggest, 'hide': True}
+        for suggest in session['suggests']
+    ]
+
+    return suggests
 
 if __name__ == '__main__':
     if "PORT" in os.environ:
