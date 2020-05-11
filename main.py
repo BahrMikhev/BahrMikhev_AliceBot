@@ -50,6 +50,7 @@ def main():
     # Отправляем request.json и response в функцию handle_dialog.
     # Она сформирует оставшиеся поля JSON, которые отвечают
     # непосредственно за ведение диалога
+    print(request.json, response, state)
     handle_dialog(request.json, response, state)
 
     logging.info(f'Response:  {response!r}')
@@ -96,6 +97,7 @@ def main_menu(user_id, res, req):
         res['response']['text'] = 'Привет! Давай поиграем в морской бой!'
     # Получим подсказки
         res['response']['buttons'] = sessionStorage[user_id]
+    print(req, res, state)
     if req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state == 'new'
         return
