@@ -343,6 +343,7 @@ def get_first_name(req):
             return entity['value'].get('first_name', None)
 
 if __name__ == '__main__':
+    db_session.global_init()
     if "PORT" in os.environ:
         app.run(host='0.0.0.0', port=os.environ["PORT"])
     else:
