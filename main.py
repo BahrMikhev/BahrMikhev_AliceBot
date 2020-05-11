@@ -95,26 +95,67 @@ def main_menu(user_id, res, req):
             for suggest in sessionStorage[user_id]['suggests']
         ]
         res['response']['buttons'] = suggests
-    print(req, res, state)
     if req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state == 'new'
         new_game(user_id, res, req)
         return
-    if req['request']['original_utterance'].lower() in ['авторизация', 'логин', 'войти']:
+    elif req['request']['original_utterance'].lower() in ['авторизация', 'логин', 'войти']:
         state == 'auth'
         auth(user_id, res, req)
         return
-    if req['request']['original_utterance'].lower() == 'рекорды':
+    elif req['request']['original_utterance'].lower() == 'рекорды':
         state == 'scores'
         highscores(user_id, res, req)
         return
-    if req['request']['original_utterance'].lower() in ['помощь', 'помоги', 'что делать']:
+    elif req['request']['original_utterance'].lower() in ['помощь', 'помоги', 'что делать']:
         state == 'help'
         help(user_id, res, req)
         return
+    else:
+        res['response']['text'] = 'Попробуй ещё раз'
+        suggests = [
+            {'title': suggest, 'hide': True}
+            for suggest in sessionStorage[user_id]['suggests']
+        ]
+        res['response']['buttons'] = suggests
 
 def new_game(user_id, res, req):
-    res['response']['text'] = 'Меню новой игры'
+    sessionStorage[user_id] = {
+        'suggests': [
+            "Игра на бумаге",
+            "Игра без бумаги",
+            "Назад",
+        ]
+    }
+    # Заполняем текст ответа
+    res['response']['text'] = '''Для того, чтобы начать новую игру выбери один из режимов:
+                                 игра на листе бумаги, или на экране телефона'''
+    # Кнопки
+    suggests = [
+        {'title': suggest, 'hide': True}
+        for suggest in sessionStorage[user_id]['suggests']
+    ]
+    res['response']['buttons'] = suggests
+
+    if req['request']['original_utterance'].lower() == 'игра на бумаге':
+        state == 'paper'
+        gameplay_paper(user_id, res, req)
+        return
+    elif req['request']['original_utterance'].lower() == 'игра без бумаги':
+        state == 'virtual'
+        gameplay_virtual(user_id, res, req)
+        return
+    elif req['request']['original_utterance'].lower() == 'назад':
+        state == 'menu'
+        main_menu(user_id, res, req)
+        return
+    else:
+        res['response']['text'] = 'Попробуй ещё раз'
+        suggests = [
+            {'title': suggest, 'hide': True}
+            for suggest in sessionStorage[user_id]['suggests']
+        ]
+        res['response']['buttons'] = suggests
 
 def gameplay_virtual(user_id, res, req):
     res['response']['text'] = 'Виртуальная игра!'
