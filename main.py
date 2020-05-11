@@ -172,7 +172,7 @@ def new_game(user_id, res, req, called):
 
 
 def gameplay_virtual(user_id, res, req, called):
-    global user_field, computer_field, g_field, c_field, move
+    global user_field, computer_field, g_field, c_field, move, csum, gsum, c_power, g_power
     message = list()
     correct = False
     def let(s):
