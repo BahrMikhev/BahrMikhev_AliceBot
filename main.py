@@ -6,6 +6,7 @@ import os
 import json
 from data import db_session
 from data.users import User
+import hashlib
 
 app = Flask(__name__)
 
@@ -214,10 +215,12 @@ def auth(user_id, res, req, called):
             pass_2 = req['request']['original_utterance'].lower()
             if pass_1 == pass_2:
                 res['response']['text'] = 'Вы успешно зарегистрированы!'
+                hash_object = hashlib.sha1(pass_1.encode())
+                hex_dig = hash_object.hexdigest()
                 session = db_session.create_session()
                 user = User()
                 user.name = sessionStorage[user_id]['first_name']
-                user.hashed_password = hash(pass_1)
+                user.hashed_password = hex_dig
                 session.add(user)
                 session.commit()
                 logged = True
@@ -235,8 +238,9 @@ def auth(user_id, res, req, called):
             find_pass = [user.hashed_password for user in session.query(User).filter(
                 (User.name == sessionStorage[user_id]['first_name']))]
             find_pass = find_pass[0]
-            logging.info(f'PASS_1: {hash(pass_1)}, PASS_2: {find_pass}')
-            if hash(pass_1) == find_pass:
+            hash_object = hashlib.sha1(pass_1.encode())
+            hex_dig = hash_object.hexdigest()
+            if hex_dig == find_pass:
                 res['response']['text'] = 'Вы успешно авторизовались!'
                 logged = True
                 auth_pos = 0
@@ -248,10 +252,7 @@ def auth(user_id, res, req, called):
                 state = 'menu'
                 return
     else:
-        session = db_session.create_session()
-        find_id = [user.name for user in session.query(User).filter((User.id == id_))]
-        username = find_id[0]
-        res['response']['text'] = f'Вы уже вошли в аккаунт как {username}'
+        res['response']['text'] = f"Вы уже вошли в аккаунт как {sessionStorage[user_id]['first_name']}"
         sessionStorage[user_id] = {
             'suggests': [
                 "Выйти из аккаунта",
