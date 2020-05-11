@@ -51,7 +51,7 @@ def main():
     # Она сформирует оставшиеся поля JSON, которые отвечают
     # непосредственно за ведение диалога
     print(request.json, response, state)
-    handle_dialog(request.json, response, state)
+    handle_dialog(request.json, response)
 
     logging.info(f'Response:  {response!r}')
 
