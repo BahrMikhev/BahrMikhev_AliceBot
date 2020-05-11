@@ -501,7 +501,7 @@ def get_first_name(req):
             return entity['value'].get('first_name', None)
 
 def print_field(field):
-    s =
+    pass
 
 if __name__ == '__main__':
     db_session.global_init()
