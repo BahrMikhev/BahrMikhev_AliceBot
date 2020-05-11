@@ -212,20 +212,16 @@ def auth(user_id, res, req, called):
             return
         elif auth_pos == 2:
             pass_2 = req['request']['original_utterance'].lower()
-            logging.info(f'PASS_1: {pass_1}, PASS_2: {pass_2}')
             if pass_1 == pass_2:
                 res['response']['text'] = 'Вы успешно зарегистрированы!'
-                logging.info(f"RESPONSE: {res['response']['text']}")
                 session = db_session.create_session()
                 user = User()
                 user.name = sessionStorage[user_id]['first_name']
                 user.hashed_password = hash(pass_1)
-                logging.info(f"USER: {user}")
                 session.add(user)
                 session.commit()
                 logged = True
                 auth_pos = 0
-                logging.info(f"USER: {user}")
                 state = 'menu'
                 return
             else:
@@ -239,6 +235,7 @@ def auth(user_id, res, req, called):
             find_pass = [user.hashed_password for user in session.query(User).filter(
                 (User.name == sessionStorage[user_id]['first_name']))]
             find_pass = find_pass[0]
+            logging.info(f'PASS_1: {hash(pass_1)}, PASS_2: {find_pass}')
             if hash(pass_1) == find_pass:
                 res['response']['text'] = 'Вы успешно авторизовались!'
                 logged = True
