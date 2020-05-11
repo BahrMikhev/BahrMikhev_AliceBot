@@ -122,6 +122,7 @@ def new_game(user_id, res, req, called):
         # Заполняем текст ответа
         res['response']['text'] = '''Для того, чтобы начать новую игру выбери один из режимов:
                                      игра на листе бумаги, или на экране телефона'''
+        logging.info(f"RESPONSE TEXT: {res['response']['text']}")
         # Кнопки
         suggests = [
             {'title': suggest, 'hide': True}
@@ -243,6 +244,7 @@ def help(user_id, res, req, called):
             ]
         }
         # Кнопки
+        logging.info(f"RESPONSE TEXT: {res['response']['text']}")
         suggests = [
             {'title': suggest, 'hide': True}
             for suggest in sessionStorage[user_id]['suggests']
