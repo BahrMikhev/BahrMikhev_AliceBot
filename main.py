@@ -14,6 +14,11 @@ app = Flask(__name__)
 # Устанавливаем уровень логирования
 logging.basicConfig(level=logging.INFO)
 
+gsum = 20
+csum = 20
+g_power = None
+c_power = None
+
 user_field = ['a1d', 'a3d', 'a5d', 'a7d', 'c1r', 'c3r', 'c5r', 'c7r', 'a9r', 'g3d']
 computer_field = None
 g_field = None
