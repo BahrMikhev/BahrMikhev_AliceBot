@@ -64,20 +64,15 @@ def handle_dialog(req, res):
 
     if state == 'menu':
         main_menu(user_id, res, req)
-
-    if state == 'virtual':
+    elif state == 'virtual':
         gameplay_virtual(user_id, res, req)
-
-    if state == 'paper':
+    elif state == 'paper':
         gameplay_paper(user_id, res, req)
-
-    if state == 'auth':
+    elif state == 'auth':
         auth(user_id, res, req)
-
-    if state == 'scores':
+    elif state == 'scores':
         highscores(user_id, res, req)
-
-    if state == 'help':
+    elif state == 'help':
         highscores(user_id, res, req)
 
 
@@ -104,15 +99,19 @@ def main_menu(user_id, res, req):
     print(req, res, state)
     if req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state == 'new'
+        new_game()
         return
     if req['request']['original_utterance'].lower() in ['авторизация', 'логин', 'войти']:
         state == 'auth'
+        auth()
         return
     if req['request']['original_utterance'].lower() == 'рекорды':
         state == 'scores'
+        highscores()
         return
     if req['request']['original_utterance'].lower() in ['помощь', 'помоги', 'что делать']:
         state == 'help'
+        help()
         return
 
 def new_game(user_id, res, req):
