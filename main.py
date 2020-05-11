@@ -221,15 +221,17 @@ def auth(user_id, res, req, called):
                 user = User()
                 user.name = sessionStorage[user_id]['first_name']
                 user.hashed_password = hash(pass_1)
+                logging.info(f"USER: {user}")
                 session.add(user)
                 logged = True
                 auth_pos = 0
-                main_menu(user_id, res, req, True)
+                logging.info(f"USER: {user}")
+                state = 'menu'
                 return
             else:
                 res['response']['text'] = 'Пароли не совпадают. Попробуйте ещё раз'
                 auth_pos = 0
-                main_menu(user_id, res, req, True)
+                state = 'menu'
                 return
         elif auth_pos == 3:
             pass_1 = req['request']['original_utterance'].lower()
@@ -241,12 +243,12 @@ def auth(user_id, res, req, called):
                 res['response']['text'] = 'Вы успешно авторизовались!'
                 logged = True
                 auth_pos = 0
-                main_menu(user_id, res, req, True)
+                state = 'menu'
                 return
             else:
                 res['response']['text'] = 'Пароль неверный'
                 auth_pos = 0
-                main_menu(user_id, res, req, True)
+                state = 'menu'
                 return
     else:
         session = db_session.create_session()
