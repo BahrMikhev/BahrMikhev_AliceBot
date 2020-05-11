@@ -36,7 +36,6 @@ state = 'menu'
 # который отправила нам Алиса в запросе POST
 def main():
     logging.info(f'Request: {request.json!r}')
-    state = 'menu'
     # Начинаем формировать ответ, согласно документации
     # мы собираем словарь, который потом при помощи
     # библиотеки json преобразуем в JSON и отдадим Алисе
@@ -62,13 +61,6 @@ def main():
 def handle_dialog(req, res):
     user_id = req['session']['user_id']
 
-    if req['session']['new']:
-        # Это новый пользователь.
-        # Инициализируем сессию и поприветствуем его.
-        # Запишем подсказки, которые мы ему покажем в первый раз
-        main_menu()
-        return
-
     if state == 'menu':
         main_menu(user_id, res, req)
 
@@ -89,6 +81,7 @@ def handle_dialog(req, res):
 
 
 
+
 def main_menu(user_id, res, req):
     sessionStorage[user_id] = {
         'suggests': [
@@ -99,9 +92,10 @@ def main_menu(user_id, res, req):
         ]
     }
     # Заполняем текст ответа
-    res['response']['text'] = 'Привет! Давай поиграем в морской бой!'
+    if req['session']['new']:
+        res['response']['text'] = 'Привет! Давай поиграем в морской бой!'
     # Получим подсказки
-    res['response']['buttons'] = sessionStorage[user_id]
+        res['response']['buttons'] = sessionStorage[user_id]
     if req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state == 'new'
         return
