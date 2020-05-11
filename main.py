@@ -454,7 +454,13 @@ def auth(user_id, res, req, called):
 def highscores(user_id, res, req, called):
     global state
     if called:
-        res['response']['text'] = 'Рекорды'
+        sessionStorage[user_id] = {
+            'suggests': [
+                "Назад",
+            ]
+        }
+        res['response']['text'] = 'Рекорды. Тут пока пусто.'
+        return
     if req['request']['original_utterance'].lower() == 'назад':
         state = 'menu'
         main_menu(user_id, res, req, True)
