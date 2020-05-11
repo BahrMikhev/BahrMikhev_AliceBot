@@ -254,21 +254,22 @@ def auth(user_id, res, req, called):
                 state = 'menu'
                 return
     else:
-        session = db_session.create_session()
-        res['response']['text'] = f"Вы уже вошли в аккаунт как {firstname}"
-        sessionStorage[user_id] = {
-            'suggests': [
-                "Выйти из аккаунта",
-                "Назад",
+        if called:
+            res['response']['text'] = f"Вы уже вошли в аккаунт как {firstname}"
+            sessionStorage[user_id] = {
+                'suggests': [
+                    "Выйти из аккаунта",
+                    "Назад",
+                ]
+            }
+            # Кнопки
+            suggests = [
+                {'title': suggest, 'hide': True}
+                for suggest in sessionStorage[user_id]['suggests']
             ]
-        }
-        # Кнопки
-        suggests = [
-            {'title': suggest, 'hide': True}
-            for suggest in sessionStorage[user_id]['suggests']
-        ]
-        res['response']['buttons'] = suggests
-
+            res['response']['buttons'] = suggests
+            return
+        
         if req['request']['original_utterance'].lower() in ['выйти из аккаунта', 'выйти']:
             logged = False
             id_ = -1
