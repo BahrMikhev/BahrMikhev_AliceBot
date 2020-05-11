@@ -136,11 +136,11 @@ def new_game(user_id, res, req, called):
         return
     elif req['request']['original_utterance'].lower() == 'игра без бумаги':
         state = 'virtual'
-        gameplay_virtual(user_id, res, req, called)
+        gameplay_virtual(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() == 'назад':
         state = 'menu'
-        main_menu(user_id, res, req, called)
+        main_menu(user_id, res, req, True)
         return
     else:
         res['response']['text'] = 'Что вы хотите сделать?'
@@ -262,7 +262,7 @@ def help(user_id, res, req, called):
             for suggest in sessionStorage[user_id]['suggests']
         ]
         res['response']['buttons'] = suggests
-
+        
 
 def get_first_name(req):
     # перебираем сущности
