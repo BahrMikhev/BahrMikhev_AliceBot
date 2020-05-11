@@ -47,7 +47,6 @@ def main():
 
 def handle_dialog(req, res):
     user_id = req['session']['user_id']
-    logging.info(f"RESPONSE handle_1 TEXT: {res['response']['text']}")
     if state == 'menu':
         main_menu(user_id, res, req, False)
     if state == 'new':
