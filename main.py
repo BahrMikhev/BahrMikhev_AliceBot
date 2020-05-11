@@ -191,13 +191,16 @@ def auth(user_id, res, req, called):
         if sessionStorage[user_id]['first_name'] is None:
             first_name = get_first_name(req)
         # если не нашли, то сообщаем пользователю что не расслышали.
+            logging.info(f'FIRST_NAME: {first_name}')
             if first_name is None:
                 res['response']['text'] = \
                     'Не расслышал имя. Повтори, пожалуйста!'
         if auth_pos == 0 and first_name:
+            logging.info(f'NAME_FOUND: {first_name}')
             sessionStorage[user_id]['first_name'] = first_name
             session = db_session.create_session()
             find_name = [user.name for user in session.query(User).filter((User.name == sessionStorage[user_id]['first_name'] ))]
+            logging.info(f'FIND_NAME: {find_name}')
             if find_name:
                 find_id = find_name[0]
                 res['response']['text'] = 'Назовите кодовое слово'
