@@ -194,7 +194,8 @@ def auth(user_id, res, req, called):
             if first_name is None:
                 res['response']['text'] = \
                     'Не расслышал имя. Повтори, пожалуйста!'
-        elif auth_pos == 0:
+        if auth_pos == 0 and first_name:
+            sessionStorage[user_id]['first_name'] = first_name
             session = db_session.create_session()
             find_name = [user.name for user in session.query(User).filter((User.name == sessionStorage[user_id]['first_name'] ))]
             if find_name:
@@ -219,10 +220,12 @@ def auth(user_id, res, req, called):
                 user.hashed_password = hash(pass_1)
                 session.add(user)
                 logged = True
+                auth_pos = 0
                 main_menu(user_id, res, req, True)
                 return
             else:
                 res['response']['text'] = 'Пароли не совпадают. Попробуйте ещё раз'
+                auth_pos = 0
                 main_menu(user_id, res, req, True)
                 return
         elif auth_pos == 3:
@@ -234,10 +237,12 @@ def auth(user_id, res, req, called):
             if hash(pass_1) == find_pass:
                 res['response']['text'] = 'Вы успешно авторизовались!'
                 logged = True
+                auth_pos = 0
                 main_menu(user_id, res, req, True)
                 return
             else:
                 res['response']['text'] = 'Пароль неверный'
+                auth_pos = 0
                 main_menu(user_id, res, req, True)
                 return
     else:
