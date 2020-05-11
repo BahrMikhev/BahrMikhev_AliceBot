@@ -50,6 +50,8 @@ def handle_dialog(req, res):
 
     if state == 'menu':
         main_menu(user_id, res, req)
+    if state == 'new':
+        new_game(user_id, res, req)
     elif state == 'virtual':
         gameplay_virtual(user_id, res, req)
     elif state == 'paper':
