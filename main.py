@@ -63,7 +63,7 @@ def handle_dialog(req, res):
     elif state == 'new':
         new_game(user_id, res, req, False)
     elif state == 'virtual':
-        ship_placement(user_id, res, req, False)
+        gameplay_virtual(user_id, res, req, False)
     elif state == 'paper':
         gameplay_paper(user_id, res, req, False)
     elif state == 'auth':
@@ -151,7 +151,7 @@ def new_game(user_id, res, req, called):
         return
     elif req['request']['original_utterance'].lower() == 'игра без бумаги':
         state = 'virtual'
-        ship_placement(user_id, res, req, True)
+        gameplay_virtual(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() == 'назад':
         state = 'menu'
