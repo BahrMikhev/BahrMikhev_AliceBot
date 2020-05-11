@@ -269,15 +269,15 @@ def gameplay_virtual(user_id, res, req, called):
         l = let(code)
         n = num(code)
         if field[l][n] == 0:
-            resultus = 'Мимо'
+            resultus = 'Мимо.'
             field[l][n] = 100
             change = True
         else:
             powerlist[field[l][n]] -= 1
             if (powerlist[field[l][n]] == 0):
-                resultus = 'Убит'
+                resultus = 'Убит.'
             else:
-                resultus = 'Ранен'
+                resultus = 'Ранен.'
             field[l][n] = 200
         if sum(powerlist) == 0:
             end = True
