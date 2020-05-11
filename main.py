@@ -77,6 +77,8 @@ def handle_dialog(req, res):
         highscores(user_id, res, req, False)
     elif state == 'help':
         help(user_id, res, req, False)
+    elif state == 'placement':
+        ship_placement(user_id, res, req, False)
     logging.info(f"RESPONSE handle_2 TEXT: {res['response']['text']}")
 
 
@@ -125,6 +127,8 @@ def main_menu(user_id, res, req, called):
         ]
         res['response']['buttons'] = suggests
 
+
+
 def new_game(user_id, res, req, called):
     global state
 
@@ -155,8 +159,8 @@ def new_game(user_id, res, req, called):
         gameplay_paper(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() == 'игра без бумаги':
-        state = 'virtual'
-        gameplay_virtual(user_id, res, req, True)
+        state = 'placement'
+        ship_placement(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() == 'назад':
         state = 'menu'
@@ -247,7 +251,7 @@ def gameplay_virtual(user_id, res, req, called):
             message.append('Вы сюда уже стреляли')
         else:
             correct = True
-            return input_code, message
+        return input_code, message
 
     def generate_code(field):
         while True:
@@ -319,16 +323,15 @@ def gameplay_virtual(user_id, res, req, called):
 a = ['a1d', 'a3d', 'a5d', 'a7d', 'c1r', 'c3r', 'c5r', 'c7r', 'a9r', 'g3d']
 
 def ship_placement(user_id, res, req, called):
-    global state
+    global state, user_field
     if called:
-        res['response']['text'] = 'Виртуальная игра!'
+        res['response']['text'] = 'Введите координаты ваших кораблей'
         return
-    if req['request']['original_utterance'].lower() == 'назад':
-        state = 'menu'
-        main_menu(user_id, res, req, True)
-        return
-    else:
-        res['response']['text'] = 'Что вы хотите сделать?'
+    user_field = (req['request']['original_utterance'].lower()).split(',')
+    state = 'menu'
+    gameplay_virtual(user_id, res, req, True)
+    return
+
 def gameplay_paper(user_id, res, req, called):
     global state
     if called:
@@ -506,8 +509,7 @@ def get_first_name(req):
             # Во всех остальных случаях возвращаем None.
             return entity['value'].get('first_name', None)
 
-def print_field(field):
-    pass
+
 
 if __name__ == '__main__':
     db_session.global_init()
