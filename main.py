@@ -49,24 +49,24 @@ def handle_dialog(req, res):
     user_id = req['session']['user_id']
 
     if state == 'menu':
-        main_menu(user_id, res, req)
+        main_menu(user_id, res, req, False)
     if state == 'new':
-        new_game(user_id, res, req)
+        new_game(user_id, res, req, False)
     elif state == 'virtual':
-        gameplay_virtual(user_id, res, req)
+        gameplay_virtual(user_id, res, req, False)
     elif state == 'paper':
-        gameplay_paper(user_id, res, req)
+        gameplay_paper(user_id, res, req, False)
     elif state == 'auth':
-        auth(user_id, res, req)
+        auth(user_id, res, req, False)
     elif state == 'scores':
-        highscores(user_id, res, req)
+        highscores(user_id, res, req, False)
     elif state == 'help':
-        highscores(user_id, res, req)
+        highscores(user_id, res, req, False)
 
 
 
 
-def main_menu(user_id, res, req):
+def main_menu(user_id, res, req, called):
     sessionStorage[user_id] = {
         'suggests': [
             "Новая игра",
@@ -86,19 +86,19 @@ def main_menu(user_id, res, req):
         res['response']['buttons'] = suggests
     elif req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state == 'new'
-        handle_dialog(req, res)
+        new_game(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() in ['авторизация', 'логин', 'войти']:
         state == 'auth'
-        handle_dialog(req, res)
+        auth(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() == 'рекорды':
         state == 'scores'
-        handle_dialog(req, res)
+        highscores(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() in ['помощь', 'помоги', 'что делать']:
         state == 'help'
-        handle_dialog(req, res)
+        help(user_id, res, req, True)
         return
     else:
         res['response']['text'] = 'Что вы хотите сделать?'
@@ -108,35 +108,33 @@ def main_menu(user_id, res, req):
         ]
         res['response']['buttons'] = suggests
 
-def new_game(user_id, res, req):
-    sessionStorage[user_id] = {
-        'suggests': [
-            "Игра на бумаге",
-            "Игра без бумаги",
-            "Назад",
+def new_game(user_id, res, req, called):
+    if called:
+        sessionStorage[user_id] = {
+            'suggests': [
+                "Игра на бумаге",
+                "Игра без бумаги",
+                "Назад",
+            ]
+        }
+        # Заполняем текст ответа
+        res['response']['text'] = '''Для того, чтобы начать новую игру выбери один из режимов:
+                                     игра на листе бумаги, или на экране телефона'''
+        # Кнопки
+        suggests = [
+            {'title': suggest, 'hide': True}
+            for suggest in sessionStorage[user_id]['suggests']
         ]
-    }
-    # Заполняем текст ответа
-    res['response']['text'] = '''Для того, чтобы начать новую игру выбери один из режимов:
-                                 игра на листе бумаги, или на экране телефона'''
-    # Кнопки
-    suggests = [
-        {'title': suggest, 'hide': True}
-        for suggest in sessionStorage[user_id]['suggests']
-    ]
-    res['response']['buttons'] = suggests
-
+        res['response']['buttons'] = suggests
+        return
     if req['request']['original_utterance'].lower() == 'игра на бумаге':
         state == 'paper'
-        handle_dialog(req, res)
         return
     elif req['request']['original_utterance'].lower() == 'игра без бумаги':
         state == 'virtual'
-        handle_dialog(req, res)
         return
     elif req['request']['original_utterance'].lower() == 'назад':
         state == 'menu'
-        handle_dialog(req, res)
         return
     else:
         res['response']['text'] = 'Что вы хотите сделать?'
@@ -147,17 +145,19 @@ def new_game(user_id, res, req):
         res['response']['buttons'] = suggests
 
 
-def gameplay_virtual(user_id, res, req):
+def gameplay_virtual(user_id, res, req, called):
     res['response']['text'] = 'Виртуальная игра!'
 
 
-def gameplay_paper(user_id, res, req):
+def gameplay_paper(user_id, res, req, called):
     res['response']['text'] = 'Игра на бумаге'
 
 
-def auth(user_id, res, req):
+def auth(user_id, res, req, called):
     if not logged:
-        res['response']['text'] = 'Назовите своё имя'
+        if called:
+            res['response']['text'] = 'Назовите своё имя'
+            return
     else:
         session = db_session.create_session()
         find_id = [user.name for user in session.query(User).filter((User.id == id_))]
@@ -180,11 +180,9 @@ def auth(user_id, res, req):
             logged = False
             id_ = -1
             state == 'menu'
-            handle_dialog(req, res)
             return
         elif req['request']['original_utterance'].lower() == 'назад':
             state == 'menu'
-            handle_dialog(req, res)
             return
         else:
             res['response']['text'] = 'Что вы хотите сделать?'
@@ -194,28 +192,30 @@ def auth(user_id, res, req):
             ]
             res['response']['buttons'] = suggests
 
-def highscores(user_id, res, req):
+def highscores(user_id, res, req, called):
     res['response']['text'] = 'Рекорды'
 
-def help(user_id, res, req):
-    res['response']['text'] = '''В игре "морской бой" вам необходимо уничтожить вражескую флотилию за как можно меньшее количество ходов.
-                                 Для игры на бумаге вам необходимо начертить два поля 10 на 10 клеток и расположить на нём 10 кораблей: один четырёхпалубный, два - трёхпалубных, три - двухпалубных и четыре - однопалубных.
-                                 Между кораблями должна быть хотя бы одна клетка.
-                                 Затем вы и компьютер поочерёдно совершаете выстрелы, называя желаемую координату. Если в ваш корабль попали и у него есть целые палубы - скажите "попал", если корабль уничтожен - скажите "убит"
-                                 В игре без бумаги вам необходимо вначале расставить корабли на виртуальном поле, называя координату, количество палуб и ориентацию корабля (вверх, вниз, вправо, влево). Однопалубные корабли ориентировать не нужно.
-                                 Так же в этом режиме вам не требуется смотреть за попаданиями в ваши корабли.
-                                 Приятной игры!'''
-    sessionStorage[user_id] = {
-        'suggests': [
-            "Назад",
+def help(user_id, res, req, called):
+    if called:
+        res['response']['text'] = '''В игре "морской бой" вам необходимо уничтожить вражескую флотилию за как можно меньшее количество ходов.
+                                     Для игры на бумаге вам необходимо начертить два поля 10 на 10 клеток и расположить на нём 10 кораблей: один четырёхпалубный, два - трёхпалубных, три - двухпалубных и четыре - однопалубных.
+                                     Между кораблями должна быть хотя бы одна клетка.
+                                     Затем вы и компьютер поочерёдно совершаете выстрелы, называя желаемую координату. Если в ваш корабль попали и у него есть целые палубы - скажите "попал", если корабль уничтожен - скажите "убит"
+                                     В игре без бумаги вам необходимо вначале расставить корабли на виртуальном поле, называя координату, количество палуб и ориентацию корабля (вверх, вниз, вправо, влево). Однопалубные корабли ориентировать не нужно.
+                                     Так же в этом режиме вам не требуется смотреть за попаданиями в ваши корабли.
+                                     Приятной игры!'''
+        sessionStorage[user_id] = {
+            'suggests': [
+                "Назад",
+            ]
+        }
+        # Кнопки
+        suggests = [
+            {'title': suggest, 'hide': True}
+            for suggest in sessionStorage[user_id]['suggests']
         ]
-    }
-    # Кнопки
-    suggests = [
-        {'title': suggest, 'hide': True}
-        for suggest in sessionStorage[user_id]['suggests']
-    ]
-    res['response']['buttons'] = suggests
+        res['response']['buttons'] = suggests
+        return
     if req['request']['original_utterance'].lower() == 'назад':
         state == 'menu'
         handle_dialog(req, res)
