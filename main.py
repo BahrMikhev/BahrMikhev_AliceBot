@@ -216,13 +216,14 @@ def auth(user_id, res, req, called):
             logging.info(f'PASS_1: {pass_1}, PASS_2: {pass_2}')
             if pass_1 == pass_2:
                 res['response']['text'] = 'Вы успешно зарегистрированы!'
-                logging.info(f"RESPONCE: {res['response']['text']}")
+                logging.info(f"RESPONSE: {res['response']['text']}")
                 session = db_session.create_session()
                 user = User()
                 user.name = sessionStorage[user_id]['first_name']
                 user.hashed_password = hash(pass_1)
                 logging.info(f"USER: {user}")
                 session.add(user)
+                session.commit()
                 logged = True
                 auth_pos = 0
                 logging.info(f"USER: {user}")
