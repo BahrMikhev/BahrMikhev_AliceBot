@@ -95,7 +95,7 @@ def main_menu(user_id, res, req):
             for suggest in sessionStorage[user_id]['suggests']
         ]
         res['response']['buttons'] = suggests
-    if req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
+    elif req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state == 'new'
         new_game(user_id, res, req)
         return
