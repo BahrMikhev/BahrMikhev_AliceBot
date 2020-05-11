@@ -61,7 +61,7 @@ def handle_dialog(req, res):
     elif state == 'scores':
         highscores(user_id, res, req, False)
     elif state == 'help':
-        highscores(user_id, res, req, False)
+        help(user_id, res, req, False)
 
 
 
@@ -262,7 +262,7 @@ def help(user_id, res, req, called):
             for suggest in sessionStorage[user_id]['suggests']
         ]
         res['response']['buttons'] = suggests
-        
+
 
 def get_first_name(req):
     # перебираем сущности
