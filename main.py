@@ -459,7 +459,12 @@ def highscores(user_id, res, req, called):
                 "Назад",
             ]
         }
+        suggests = [
+            {'title': suggest, 'hide': True}
+            for suggest in sessionStorage[user_id]['suggests']
+        ]
         res['response']['text'] = 'Рекорды. Тут пока пусто.'
+        res['response']['buttons'] = suggests
         return
     if req['request']['original_utterance'].lower() == 'назад':
         state = 'menu'
