@@ -7,7 +7,8 @@ import json
 from data import db_session
 from data.users import User
 import hashlib
-
+from sea_battle import game
+from sea_war_strategies import genesis
 app = Flask(__name__)
 
 # Устанавливаем уровень логирования
