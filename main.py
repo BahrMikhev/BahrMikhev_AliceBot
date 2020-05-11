@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.INFO)
 # Когда он откажется купить слона,
 # то мы уберем одну подсказку. Как будто что-то меняется :)
 sessionStorage = {}
-
+state = 'menu'
 
 @app.route('/post', methods=['POST'])
 # Функция получает тело запроса и возвращает ответ.
@@ -36,7 +36,7 @@ sessionStorage = {}
 # который отправила нам Алиса в запросе POST
 def main():
     logging.info(f'Request: {request.json!r}')
-
+    state = 'menu'
     # Начинаем формировать ответ, согласно документации
     # мы собираем словарь, который потом при помощи
     # библиотеки json преобразуем в JSON и отдадим Алисе
@@ -51,7 +51,7 @@ def main():
     # Отправляем request.json и response в функцию handle_dialog.
     # Она сформирует оставшиеся поля JSON, которые отвечают
     # непосредственно за ведение диалога
-    handle_dialog(request.json, response)
+    handle_dialog(request.json, response, state)
 
     logging.info(f'Response:  {response!r}')
 
@@ -66,73 +66,69 @@ def handle_dialog(req, res):
         # Это новый пользователь.
         # Инициализируем сессию и поприветствуем его.
         # Запишем подсказки, которые мы ему покажем в первый раз
-
-        sessionStorage[user_id] = {
-            'suggests': [
-                "Не хочу.",
-                "Не буду.",
-                "Отстань!",
-            ]
-        }
-        # Заполняем текст ответа
-        res['response']['text'] = 'Привет! Купи слона!'
-        # Получим подсказки
-        res['response']['buttons'] = get_suggests(user_id)
+        main_menu()
         return
 
-    # Сюда дойдем только, если пользователь не новый,
-    # и разговор с Алисой уже был начат
-    # Обрабатываем ответ пользователя.
-    # В req['request']['original_utterance'] лежит весь текст,
-    # что нам прислал пользователь
-    # Если он написал 'ладно', 'куплю', 'покупаю', 'хорошо',
-    # то мы считаем, что пользователь согласился.
-    # Подумайте, всё ли в этом фрагменте написано "красиво"?
-    if req['request']['original_utterance'].lower() in [
-        'ладно',
-        'куплю',
-        'покупаю',
-        'хорошо'
-    ]:
-        # Пользователь согласился, прощаемся.
-        res['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
-        res['response']['end_session'] = True
+    if state == 'menu':
+        main_menu(user_id, res, req)
+
+    if state == 'virtual':
+        gameplay_virtual(user_id, res, req)
+
+    if state == 'paper':
+        gameplay_paper(user_id, res, req)
+
+    if state == 'auth':
+        auth(user_id, res, req)
+
+    if state == 'scores':
+        highscores(user_id, res, req)
+
+    if state == 'help':
+        highscores(user_id, res, req)
+
+
+
+def main_menu(user_id, res, req):
+    sessionStorage[user_id] = {
+        'suggests': [
+            "Новая игра",
+            "Авторизация",
+            "Рекорды",
+            "Помощь",
+        ]
+    }
+    # Заполняем текст ответа
+    res['response']['text'] = 'Привет! Давай поиграем в морской бой!'
+    # Получим подсказки
+    res['response']['buttons'] = sessionStorage[user_id]
+    if req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
+        state == 'new'
+        return
+    if req['request']['original_utterance'].lower() in ['авторизация', 'логин', 'войти']:
+        state == 'auth'
+        return
+    if req['request']['original_utterance'].lower() == 'рекорды':
+        state == 'scores'
+        return
+    if req['request']['original_utterance'].lower() in ['помощь', 'помоги', 'что делать']:
+        state == 'help'
         return
 
-    # Если нет, то убеждаем его купить слона!
-    res['response']['text'] = \
-        f"Все говорят '{req['request']['original_utterance']}', а ты купи слона!"
-    res['response']['buttons'] = get_suggests(user_id)
+def new_game(user_id, res, req):
+    pass
 
+def gameplay_virtual(user_id, res, req):
+    pass
 
-# Функция возвращает две подсказки для ответа.
-def get_suggests(user_id):
-    session = sessionStorage[user_id]
+def gameplay_paper(user_id, res, req):
+    pass
 
-    # Выбираем две первые подсказки из массива.
-    suggests = [
-        {'title': suggest, 'hide': True}
-        for suggest in session['suggests'][:2]
-    ]
+def auth(user_id, res, req):
+    pass
 
-    # Убираем первую подсказку, чтобы подсказки менялись каждый раз.
-    session['suggests'] = session['suggests'][1:]
-    sessionStorage[user_id] = session
+def highscores(user_id, res, req):
+    pass
 
-    # Если осталась только одна подсказка, предлагаем подсказку
-    # со ссылкой на Яндекс.Маркет.
-    if len(suggests) < 2:
-        suggests.append({
-            "title": "Ладно",
-            "url": "https://market.yandex.ru/search?text=слон",
-            "hide": True
-        })
-
-    return suggests
-
-
-if __name__ == '__main__':
-    if "PORT" in os.environ:
-        app.run(host='0.0.0.0', port=os.environ["PORT"])
-    else:
-        app.run(host='127.0.0.1', port=5000)
+def help(user_id, res, req):
+    pass
