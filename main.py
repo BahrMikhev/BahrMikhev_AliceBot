@@ -182,7 +182,7 @@ def gameplay_paper(user_id, res, req, called):
         res['response']['text'] = 'Что вы хотите сделать?'
 
 def auth(user_id, res, req, called):
-    global state, logged, id_, auth_pos, pass_1, pass_2
+    global state, logged, id_, auth_pos, pass_1, pass_2, firstname
     if not logged:
         if called:
             res['response']['text'] = 'Назовите своё имя'
