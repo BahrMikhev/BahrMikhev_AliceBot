@@ -129,12 +129,15 @@ def new_game(user_id, res, req, called):
         return
     if req['request']['original_utterance'].lower() == 'игра на бумаге':
         state == 'paper'
+        gameplay_paper(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() == 'игра без бумаги':
         state == 'virtual'
+        gameplay_virtual(user_id, res, req, called)
         return
     elif req['request']['original_utterance'].lower() == 'назад':
         state == 'menu'
+        main_menu(user_id, res, req, called)
         return
     else:
         res['response']['text'] = 'Что вы хотите сделать?'
@@ -198,9 +201,6 @@ def highscores(user_id, res, req, called):
 def help(user_id, res, req, called):
     if called:
         res['response']['text'] = '''В игре "морской бой" вам необходимо уничтожить вражескую флотилию за как можно меньшее количество ходов.
-                                     Для игры на бумаге вам необходимо начертить два поля 10 на 10 клеток и расположить на нём 10 кораблей: один четырёхпалубный, два - трёхпалубных, три - двухпалубных и четыре - однопалубных.
-                                     Между кораблями должна быть хотя бы одна клетка.
-                                     Затем вы и компьютер поочерёдно совершаете выстрелы, называя желаемую координату. Если в ваш корабль попали и у него есть целые палубы - скажите "попал", если корабль уничтожен - скажите "убит"
                                      В игре без бумаги вам необходимо вначале расставить корабли на виртуальном поле, называя координату, количество палуб и ориентацию корабля (вверх, вниз, вправо, влево). Однопалубные корабли ориентировать не нужно.
                                      Так же в этом режиме вам не требуется смотреть за попаданиями в ваши корабли.
                                      Приятной игры!'''
@@ -218,7 +218,7 @@ def help(user_id, res, req, called):
         return
     if req['request']['original_utterance'].lower() == 'назад':
         state == 'menu'
-        handle_dialog(req, res)
+        main_menu(user_id, res, req, True)
         return
     else:
         res['response']['text'] = 'Что вы хотите сделать?'
@@ -228,16 +228,6 @@ def help(user_id, res, req, called):
         ]
         res['response']['buttons'] = suggests
 
-def get_suggests(user_id):
-    session = sessionStorage[user_id]
-
-    # Выбираем две первые подсказки из массива.
-    suggests = [
-        {'title': suggest, 'hide': True}
-        for suggest in session['suggests']
-    ]
-
-    return suggests
 
 def get_first_name(req):
     # перебираем сущности
