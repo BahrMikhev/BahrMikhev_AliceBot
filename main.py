@@ -212,6 +212,7 @@ def auth(user_id, res, req, called):
         elif auth_pos == 1:
             pass_1 = req['request']['original_utterance'].lower()
             res['response']['text'] = 'И ещё раз'
+            auth_pos = 2
             return
         elif auth_pos == 2:
             pass_2 = req['request']['original_utterance'].lower()
