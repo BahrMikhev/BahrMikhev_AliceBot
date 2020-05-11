@@ -155,14 +155,24 @@ def gameplay_virtual(user_id, res, req, called):
     if called:
         res['response']['text'] = 'Виртуальная игра!'
         return
-
+    if req['request']['original_utterance'].lower() == 'назад':
+        state = 'menu'
+        main_menu(user_id, res, req, True)
+        return
+    else:
+        res['response']['text'] = 'Что вы хотите сделать?'
 
 def gameplay_paper(user_id, res, req, called):
     global state
     if called:
         res['response']['text'] = 'Игра на бумаге'
         return
-
+    if req['request']['original_utterance'].lower() == 'назад':
+        state = 'menu'
+        main_menu(user_id, res, req, True)
+        return
+    else:
+        res['response']['text'] = 'Что вы хотите сделать?'
 
 def auth(user_id, res, req, called):
     global state
@@ -206,7 +216,19 @@ def auth(user_id, res, req, called):
 
 def highscores(user_id, res, req, called):
     global state
-    res['response']['text'] = 'Рекорды'
+    if called:
+        res['response']['text'] = 'Рекорды'
+    if req['request']['original_utterance'].lower() == 'назад':
+        state = 'menu'
+        main_menu(user_id, res, req, True)
+        return
+    else:
+        res['response']['text'] = 'Что вы хотите сделать?'
+        suggests = [
+            {'title': suggest, 'hide': True}
+            for suggest in sessionStorage[user_id]['suggests']
+        ]
+        res['response']['buttons'] = suggests
 
 def help(user_id, res, req, called):
     global state
