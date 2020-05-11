@@ -199,7 +199,6 @@ def auth(user_id, res, req, called):
             session = db_session.create_session()
             find_name = [user.name for user in session.query(User).filter((User.name == sessionStorage[user_id]['first_name'] ))]
             if find_name:
-                find_id = find_name[0]
                 res['response']['text'] = 'Назовите кодовое слово'
                 auth_pos = 3
                 return
