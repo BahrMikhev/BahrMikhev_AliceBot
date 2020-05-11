@@ -116,22 +116,22 @@ def main_menu(user_id, res, req):
         return
 
 def new_game(user_id, res, req):
-    pass
+    res['response']['text'] = 'Меню новой игры'
 
 def gameplay_virtual(user_id, res, req):
-    pass
+    res['response']['text'] = 'Виртуальная игра!'
 
 def gameplay_paper(user_id, res, req):
-    pass
+    res['response']['text'] = 'Игра на бумаге'
 
 def auth(user_id, res, req):
-    pass
+    res['response']['text'] = 'Авторизация'
 
 def highscores(user_id, res, req):
-    pass
+    res['response']['text'] = 'Рекорды'
 
 def help(user_id, res, req):
-    pass
+    res['response']['text'] = 'Помощь'
 
 def get_suggests(user_id):
     session = sessionStorage[user_id]
