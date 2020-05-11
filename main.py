@@ -14,7 +14,10 @@ logging.basicConfig(level=logging.INFO)
 
 sessionStorage = {}
 state = 'menu'
+auth_pos = 0
 logged = False
+pass_1 = None
+pass_2 = None
 id_ = None
 
 @app.route('/post', methods=['POST'])
@@ -177,11 +180,66 @@ def gameplay_paper(user_id, res, req, called):
         res['response']['text'] = 'Что вы хотите сделать?'
 
 def auth(user_id, res, req, called):
-    global state
+    global state, logged, id_, auth_pos, pass_1, pass_2
     if not logged:
         if called:
             res['response']['text'] = 'Назовите своё имя'
+            sessionStorage[user_id] = {
+                'first_name': None
+            }
             return
+        if sessionStorage[user_id]['first_name'] is None:
+            first_name = get_first_name(req)
+        # если не нашли, то сообщаем пользователю что не расслышали.
+            if first_name is None:
+                res['response']['text'] = \
+                    'Не расслышал имя. Повтори, пожалуйста!'
+        elif auth_pos == 0:
+            session = db_session.create_session()
+            find_name = [user.name for user in session.query(User).filter((User.name == sessionStorage[user_id]['first_name'] ))]
+            if find_name:
+                find_id = find_name[0]
+                res['response']['text'] = 'Назовите кодовое слово'
+                auth_pos = 3
+                return
+            else:
+                res['response']['text'] = 'Для регистрации назовите кодовую фразу дважды'
+                auth_pos = 1
+        elif auth_pos == 1:
+            pass_1 = req['request']['original_utterance'].lower()
+            res['response']['text'] = 'И ещё раз'
+            return
+        elif auth_pos == 2:
+            pass_2 = req['request']['original_utterance'].lower()
+            if pass_1 == pass_2:
+                res['response']['text'] = 'Вы успешно зарегистрированы!'
+                session = db_session.create_session()
+                user = User()
+                user.name = sessionStorage[user_id]['first_name']
+                user.hashed_password = hash(pass_1)
+                session.add(user)
+                logged = True
+                main_menu(user_id, res, req, True)
+                return
+            else:
+                res['response']['text'] = 'Пароли не совпадают. Попробуйте ещё раз'
+                main_menu(user_id, res, req, True)
+                return
+        elif auth_pos == 3:
+            pass_1 = req['request']['original_utterance'].lower()
+            session = db_session.create_session()
+            find_pass = [user.hashed_password for user in session.query(User).filter(
+                (User.name == sessionStorage[user_id]['first_name']))]
+            find_pass = find_pass[0]
+            if hash(pass_1) == find_pass:
+                res['response']['text'] = 'Вы успешно авторизовались!'
+                logged = True
+                main_menu(user_id, res, req, True)
+                return
+            else:
+                res['response']['text'] = 'Пароль неверный'
+                main_menu(user_id, res, req, True)
+                return
     else:
         session = db_session.create_session()
         find_id = [user.name for user in session.query(User).filter((User.id == id_))]
@@ -204,9 +262,11 @@ def auth(user_id, res, req, called):
             logged = False
             id_ = -1
             state = 'menu'
+            main_menu(user_id, res, req, True)
             return
         elif req['request']['original_utterance'].lower() == 'назад':
             state = 'menu'
+            main_menu(user_id, res, req, True)
             return
         else:
             res['response']['text'] = 'Что вы хотите сделать?'
