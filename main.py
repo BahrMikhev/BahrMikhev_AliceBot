@@ -22,7 +22,7 @@ id_ = None
 # Внутри функции доступен request.json - это JSON,
 # который отправила нам Алиса в запросе POST
 def main():
-    logging.info(f'Request: {request.json!r}')
+    logging.info(f'Request: {request.json!r}, state: {state}')
     # Начинаем формировать ответ, согласно документации
     # мы собираем словарь, который потом при помощи
     # библиотеки json преобразуем в JSON и отдадим Алисе
@@ -39,7 +39,7 @@ def main():
     # непосредственно за ведение диалога
     handle_dialog(request.json, response)
 
-    logging.info(f'Response:  {response!r}')
+    logging.info(f'Response:  {response!r}, state: {state}')
 
     # Преобразовываем в JSON и возвращаем
     return json.dumps(response)
@@ -149,11 +149,15 @@ def new_game(user_id, res, req, called):
 
 
 def gameplay_virtual(user_id, res, req, called):
-    res['response']['text'] = 'Виртуальная игра!'
+    if called:
+        res['response']['text'] = 'Виртуальная игра!'
+        return
 
 
 def gameplay_paper(user_id, res, req, called):
-    res['response']['text'] = 'Игра на бумаге'
+    if called:
+        res['response']['text'] = 'Игра на бумаге'
+        return
 
 
 def auth(user_id, res, req, called):
