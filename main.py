@@ -67,6 +67,7 @@ def handle_dialog(req, res):
 
 
 def main_menu(user_id, res, req, called):
+    global state
     sessionStorage[user_id] = {
         'suggests': [
             "Новая игра",
@@ -85,19 +86,19 @@ def main_menu(user_id, res, req, called):
         ]
         res['response']['buttons'] = suggests
     elif req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
-        state == 'new'
+        state = 'new'
         new_game(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() in ['авторизация', 'логин', 'войти']:
-        state == 'auth'
+        state = 'auth'
         auth(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() == 'рекорды':
-        state == 'scores'
+        state = 'scores'
         highscores(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() in ['помощь', 'помоги', 'что делать']:
-        state == 'help'
+        state = 'help'
         help(user_id, res, req, True)
         return
     else:
@@ -109,6 +110,7 @@ def main_menu(user_id, res, req, called):
         res['response']['buttons'] = suggests
 
 def new_game(user_id, res, req, called):
+    global state
     if called:
         sessionStorage[user_id] = {
             'suggests': [
@@ -128,15 +130,15 @@ def new_game(user_id, res, req, called):
         res['response']['buttons'] = suggests
         return
     if req['request']['original_utterance'].lower() == 'игра на бумаге':
-        state == 'paper'
+        state = 'paper'
         gameplay_paper(user_id, res, req, True)
         return
     elif req['request']['original_utterance'].lower() == 'игра без бумаги':
-        state == 'virtual'
+        state = 'virtual'
         gameplay_virtual(user_id, res, req, called)
         return
     elif req['request']['original_utterance'].lower() == 'назад':
-        state == 'menu'
+        state = 'menu'
         main_menu(user_id, res, req, called)
         return
     else:
@@ -149,18 +151,21 @@ def new_game(user_id, res, req, called):
 
 
 def gameplay_virtual(user_id, res, req, called):
+    global state
     if called:
         res['response']['text'] = 'Виртуальная игра!'
         return
 
 
 def gameplay_paper(user_id, res, req, called):
+    global state
     if called:
         res['response']['text'] = 'Игра на бумаге'
         return
 
 
 def auth(user_id, res, req, called):
+    global state
     if not logged:
         if called:
             res['response']['text'] = 'Назовите своё имя'
@@ -186,10 +191,10 @@ def auth(user_id, res, req, called):
         if req['request']['original_utterance'].lower() in ['выйти из аккаунта', 'выйти']:
             logged = False
             id_ = -1
-            state == 'menu'
+            state = 'menu'
             return
         elif req['request']['original_utterance'].lower() == 'назад':
-            state == 'menu'
+            state = 'menu'
             return
         else:
             res['response']['text'] = 'Что вы хотите сделать?'
@@ -200,9 +205,11 @@ def auth(user_id, res, req, called):
             res['response']['buttons'] = suggests
 
 def highscores(user_id, res, req, called):
+    global state
     res['response']['text'] = 'Рекорды'
 
 def help(user_id, res, req, called):
+    global state
     if called:
         res['response']['text'] = '''В игре "морской бой" вам необходимо уничтожить вражескую флотилию за как можно меньшее количество ходов.
                                      В игре без бумаги вам необходимо вначале расставить корабли на виртуальном поле, называя координату, количество палуб и ориентацию корабля (вверх, вниз, вправо, влево). Однопалубные корабли ориентировать не нужно.
@@ -221,7 +228,7 @@ def help(user_id, res, req, called):
         res['response']['buttons'] = suggests
         return
     if req['request']['original_utterance'].lower() == 'назад':
-        state == 'menu'
+        state = 'menu'
         main_menu(user_id, res, req, True)
         return
     else:
