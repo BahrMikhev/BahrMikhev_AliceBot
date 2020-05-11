@@ -49,7 +49,7 @@ def handle_dialog(req, res):
     user_id = req['session']['user_id']
     if state == 'menu':
         main_menu(user_id, res, req, False)
-    if state == 'new':
+    elif state == 'new':
         new_game(user_id, res, req, False)
     elif state == 'virtual':
         gameplay_virtual(user_id, res, req, False)
