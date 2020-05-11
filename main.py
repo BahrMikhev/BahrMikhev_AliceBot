@@ -47,7 +47,7 @@ def main():
 
 def handle_dialog(req, res):
     user_id = req['session']['user_id']
-
+    logging.info(f"RESPONSE handle_1 TEXT: {res['response']['text']}")
     if state == 'menu':
         main_menu(user_id, res, req, False)
     if state == 'new':
@@ -62,7 +62,7 @@ def handle_dialog(req, res):
         highscores(user_id, res, req, False)
     elif state == 'help':
         help(user_id, res, req, False)
-
+    logging.info(f"RESPONSE handle_2 TEXT: {res['response']['text']}")
 
 
 
@@ -88,6 +88,7 @@ def main_menu(user_id, res, req, called):
     elif req['request']['original_utterance'].lower() in ['новая игра', 'играть', 'сыграем']:
         state = 'new'
         new_game(user_id, res, req, True)
+        logging.info(f"RESPONSE menu TEXT: {res['response']['text']}")
         return
     elif req['request']['original_utterance'].lower() in ['авторизация', 'логин', 'войти']:
         state = 'auth'
@@ -129,6 +130,7 @@ def new_game(user_id, res, req, called):
             for suggest in sessionStorage[user_id]['suggests']
         ]
         res['response']['buttons'] = suggests
+        logging.info(f"RESPONSE new TEXT: {res['response']['text']}")
         return
     if req['request']['original_utterance'].lower() == 'игра на бумаге':
         state = 'paper'
