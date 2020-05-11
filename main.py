@@ -14,6 +14,7 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
 sessionStorage = {}
+firstname = None
 state = 'menu'
 auth_pos = 0
 logged = False
@@ -197,6 +198,7 @@ def auth(user_id, res, req, called):
                     'Не расслышал имя. Повтори, пожалуйста!'
         if auth_pos == 0 and first_name:
             sessionStorage[user_id]['first_name'] = first_name
+            firstname = first_name
             session = db_session.create_session()
             find_name = [user.name for user in session.query(User).filter((User.name == sessionStorage[user_id]['first_name'] ))]
             if find_name:
@@ -252,7 +254,8 @@ def auth(user_id, res, req, called):
                 state = 'menu'
                 return
     else:
-        res['response']['text'] = f"Вы уже вошли в аккаунт как {sessionStorage[user_id]['first_name']}"
+        session = db_session.create_session()
+        res['response']['text'] = f"Вы уже вошли в аккаунт как {firstname}"
         sessionStorage[user_id] = {
             'suggests': [
                 "Выйти из аккаунта",
