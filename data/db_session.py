@@ -16,7 +16,8 @@ def global_init():
         return
 
     if 'DATABASE_URL' in os.environ:  # возьмём адрес базы из переменной окружения
-        conn_str = os.environ['DATABASE_URL']  # сработает на Heroku
+        # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL?sslmode=require').replace('postgres://', 'postgresql://')
+        conn_str = os.environ.get('DATABASE_URL?sslmode=require').replace('postgres://', 'postgresql://')  # сработает на Heroku
     else:
         from config import LOCAL_DB  # сработает локально
         conn_str = LOCAL_DB
